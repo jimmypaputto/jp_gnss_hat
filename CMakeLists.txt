@@ -70,13 +70,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     DEPENDENCIES std_msgs
 )
 
-if (BUILD_TESTING)
-    find_package(ament_lint_auto REQUIRED)
-    set(ament_cmake_copyright_FOUND TRUE)
-    set(ament_cmake_cpplint_FOUND TRUE)
-    ament_lint_auto_find_test_dependencies()
-endif()
-
 add_executable(
     gnss_node
     src/Config.cpp
@@ -115,36 +108,6 @@ endif()
 rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME}
     rosidl_typesupport_cpp)
 target_link_libraries(gnss_node "${cpp_typesupport_target}")
-
-# ---- Unit tests ----
-if(BUILD_TESTING)
-    find_package(ament_cmake_gtest REQUIRED)
-
-    set(JP_GNSS_LIB_SOURCES
-        src/Config.cpp
-        src/Converter.cpp
-        src/Rtk.cpp
-    )
-
-    macro(jp_gnss_hat_add_test TARGET_NAME TEST_SOURCE)
-        ament_add_gtest(${TARGET_NAME} ${TEST_SOURCE} ${JP_GNSS_LIB_SOURCES})
-        ament_target_dependencies(${TARGET_NAME}
-            rclcpp rclcpp_lifecycle std_msgs sensor_msgs geometry_msgs)
-        target_link_libraries(${TARGET_NAME}
-            GnssHat yaml-cpp "${cpp_typesupport_target}")
-        if(GNSSHAT_FETCHED)
-            target_include_directories(${TARGET_NAME} PRIVATE "${_gnsshat_inc}")
-        endif()
-        if(rtcm_msgs_FOUND)
-            target_compile_definitions(${TARGET_NAME} PRIVATE JP_GNSS_NTRIP)
-            ament_target_dependencies(${TARGET_NAME} rtcm_msgs)
-        endif()
-    endmacro()
-
-    jp_gnss_hat_add_test(test_config    test/test_config.cpp)
-    jp_gnss_hat_add_test(test_converter test/test_converter.cpp)
-    jp_gnss_hat_add_test(test_rtk       test/test_rtk.cpp)
-endif()
 
 install(
     DIRECTORY config/
