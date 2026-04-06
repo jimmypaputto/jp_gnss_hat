@@ -1,0 +1,6 @@
+# Jimmy Paputto 2026
+# Returns the current GNSS configuration.
+
+---
+
+jp_gnss_hat/GnssConfig config

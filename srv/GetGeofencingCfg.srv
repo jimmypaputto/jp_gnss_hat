@@ -1,0 +1,10 @@
+# Jimmy Paputto 2026
+# Returns the current geofencing configuration from the GNSS module.
+
+---
+
+bool enabled
+uint8 pin_polarity            # 0=LowMeansInside, 1=LowMeansOutside
+bool pio_enabled
+uint8 confidence_level        # 0=none, 1=68%, 2=95%, 3=99.7%, 4=99.99%, 5=99.9999%
+jp_gnss_hat/Geofence[] geofences

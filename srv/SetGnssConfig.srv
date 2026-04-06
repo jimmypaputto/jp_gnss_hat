@@ -1,0 +1,10 @@
+# Jimmy Paputto 2026
+# Reconfigures the GNSS HAT. Optionally persists the new config to YAML.
+
+jp_gnss_hat/GnssConfig config
+bool save_to_yaml
+
+---
+
+bool success
+string message

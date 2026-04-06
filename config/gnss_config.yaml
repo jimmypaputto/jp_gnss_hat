@@ -1,0 +1,110 @@
+# ============================================================================
+# Jimmy Paputto — JP GNSS HAT Configuration
+# ============================================================================
+# This config works for all 3 HAT variants:
+#   - L1 GNSS HAT (u-blox NEO-M9N)
+#   - L1/L5 GNSS TIME HAT (u-blox NEO-F10T)
+#   - L1/L5 GNSS RTK HAT (u-blox NEO-F9P)
+#
+# The node auto-detects the connected HAT.
+# Sections that don't apply to your hardware are safely ignored.
+# ============================================================================
+
+# --------------------------------------------------------------------------
+# Node identity — required when running multiple GNSS nodes in one network
+# --------------------------------------------------------------------------
+# When set, the ROS node name becomes "jp_gnss_hat_<node_id>" and all topics
+# and services are prefixed accordingly:
+#   /gnss/<node_id>/navigation
+#   /gps/<node_id>/fix
+#   /gnss/<node_id>/get_config   etc.
+#
+# RTK corrections (/gnss/rtk/corrections) and NTRIP (/rtcm) remain
+# shared between base and rover — they are NOT prefixed.
+#
+# Leave commented out (or empty) for single-node setups — the default
+# names (e.g. /gnss/navigation) are used unchanged.
+# node_id: "rover"
+
+# Measurement rate: 1–25 Hz
+measurement_rate_hz: 10
+
+# --------------------------------------------------------------------------
+# Save configuration to device flash memory
+# --------------------------------------------------------------------------
+# When true, the GNSS configuration is saved to the receiver's flash memory,
+# persisting across power cycles. Use with caution — frequent writes can
+# wear out flash. Normally false (RAM-only configuration).
+save_to_flash: false
+
+# --------------------------------------------------------------------------
+# Standard ROS topic publishing (interoperability with other GNSS systems)
+# --------------------------------------------------------------------------
+# When enabled, the node publishes standard ROS messages alongside
+# the custom jp_gnss_hat topics, making it compatible with packages like
+# robot_localization, nav2, mapviz, etc.
+#
+# Published standard topics:
+#   /gps/fix            — sensor_msgs/NavSatFix
+#   /gps/vel            — geometry_msgs/TwistWithCovarianceStamped
+#   /gps/time_reference — sensor_msgs/TimeReference
+publish_standard_topics: true
+
+# Dynamic model:
+#   0  Portable       2  Stationary     3  Pedestrian
+#   4  Automotive     5  Sea            6  Airborne1G
+#   7  Airborne2G     8  Airborne4G     9  Wrist
+#   10 Bike           11 Mower          12 Escooter
+dynamic_model: 2
+
+# Timepulse pin configuration
+timepulse:
+  active: true
+  fixed_pulse:
+    frequency: 10          # Hz (when GNSS fix is acquired)
+    pulse_width: 0.1      # duty cycle (0.0–1.0)
+  # Uncomment to also pulse when there is no fix:
+  # pulse_when_no_fix:
+  #   frequency: 1
+  #   pulse_width: 0.1
+  polarity: rising        # "rising" or "falling"
+
+# --------------------------------------------------------------------------
+# Geofencing (L1 GNSS HAT and L1/L5 GNSS RTK HAT only)
+# Remove or comment out this section to disable geofencing.
+# --------------------------------------------------------------------------
+# geofencing:
+#   confidence_level: 4   # 0=none, 1=68%, 2=95%, 3=99.7%, 4=99.99%, 5=99.9999%
+#   # Uncomment to enable PIO pin output:
+#   # pio_pin_polarity: low_means_inside   # or "low_means_outside"
+#   geofences:
+#     - lat: 52.2297
+#       lon: 21.0122
+#       radius: 50.0
+#     - lat: 51.1079
+#       lon: 17.0385
+#       radius: 100.0
+
+# --------------------------------------------------------------------------
+# RTK configuration (L1/L5 GNSS RTK HAT only — NEO-F9P)
+# Remove or comment out this section for non-RTK hats.
+# --------------------------------------------------------------------------
+# use_ntrip_rtcm: false
+
+# rtk:
+#   mode: rover            # "base" or "rover"
+#   base:
+#     type: survey_in     # "survey_in", "fixed_ecef" or "fixed_lla"
+#     min_observation_time_s: 60
+#     required_accuracy_m: 2.0
+#     # For fixed_ecef:
+#     # x_m: 3856242.0
+#     # y_m: 1456789.0
+#     # z_m: 5021456.0
+#     # position_accuracy_m: 0.01
+#     # For fixed_lla:
+#     # latitude_deg: 52.2297
+#     # longitude_deg: 21.0122
+#     # height_m: 120.0
+#     # position_accuracy_m: 0.01
+

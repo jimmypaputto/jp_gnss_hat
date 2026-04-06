@@ -1,0 +1,21 @@
+measurement_rate_hz: 20
+save_to_flash: false
+publish_standard_topics: true
+dynamic_model: 0
+
+timepulse:
+  active: true
+  fixed_pulse:
+    frequency: 1
+    pulse_width: 0.1
+  polarity: rising
+
+geofencing:
+  confidence_level: 3
+  geofences:
+    - lat: 41.902205071091224
+      lon: 12.4539203390548
+      radius: 2005.0
+    - lat: 52.257211745024186
+      lon: 20.311759615806704
+      radius: 1810.0
