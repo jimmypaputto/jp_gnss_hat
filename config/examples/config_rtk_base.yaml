@@ -1,4 +1,5 @@
-measurement_rate_hz: 1
+node_id: "rtk_base"
+measurement_rate_hz: 5
 save_to_flash: false
 publish_standard_topics: true
 dynamic_model: 2
@@ -14,5 +15,5 @@ rtk:
   mode: base
   base:
     type: survey_in
-    min_observation_time_s: 120
+    min_observation_time_s: 180
     required_accuracy_m: 50.0
