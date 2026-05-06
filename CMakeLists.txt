@@ -139,7 +139,6 @@ if(BUILD_TESTING)
     jp_gnss_hat_add_test(test_rtk       test/test_rtk.cpp)
 endif()
 
-
 install(
     DIRECTORY config/
     DESTINATION share/${PROJECT_NAME}/config/
