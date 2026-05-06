@@ -29,24 +29,24 @@ else()
     message(STATUS "rtcm_msgs not found - only jp_gnss_hat/rtk protocol available")
 endif()
 
-# GnssHat — jimmypaputto/GnssHat driver (https://github.com/jimmypaputto/GnssHat)
+# gnsshat — jimmypaputto/gnsshat driver (https://github.com/jimmypaputto/gnsshat)
 # Uses system-installed version if available, otherwise fetches from GitHub.
 # System dependency: libgpiod-dev (sudo apt install libgpiod-dev)
-find_library(GNSSHAT_LIBRARY GnssHat)
+find_library(GNSSHAT_LIBRARY gnsshat)
 find_path(GNSSHAT_INCLUDE_DIR jimmypaputto/GnssHat.hpp)
 
 if(GNSSHAT_LIBRARY AND GNSSHAT_INCLUDE_DIR)
-    message(STATUS "Found system GnssHat: ${GNSSHAT_LIBRARY}")
+    message(STATUS "Found system gnsshat: ${GNSSHAT_LIBRARY}")
 else()
-    message(STATUS "System GnssHat not found — fetching from GitHub")
+    message(STATUS "System gnsshat not found — fetching from GitHub")
     include(FetchContent)
-    FetchContent_Declare(GnssHat
-        GIT_REPOSITORY https://github.com/jimmypaputto/GnssHat.git
+    FetchContent_Declare(gnsshat
+        GIT_REPOSITORY https://github.com/jimmypaputto/gnsshat.git
         GIT_SHALLOW TRUE
     )
-    FetchContent_GetProperties(GnssHat)
+    FetchContent_GetProperties(gnsshat)
     if(NOT gnsshat_POPULATED)
-        FetchContent_Populate(GnssHat)
+        FetchContent_Populate(gnsshat)
         add_subdirectory(${gnsshat_SOURCE_DIR} ${gnsshat_BINARY_DIR} EXCLUDE_FROM_ALL)
     endif()
     set(GNSSHAT_FETCHED TRUE)
@@ -88,7 +88,7 @@ ament_target_dependencies(
     geometry_msgs
     ament_index_cpp
 )
-target_link_libraries(gnss_node GnssHat yaml-cpp)
+target_link_libraries(gnss_node gnsshat yaml-cpp)
 
 if(GNSSHAT_FETCHED)
     set(_gnsshat_inc "${CMAKE_CURRENT_BINARY_DIR}/_gnsshat_include")
@@ -109,6 +109,36 @@ rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME}
     rosidl_typesupport_cpp)
 target_link_libraries(gnss_node "${cpp_typesupport_target}")
 
+# ---- Unit tests ----
+if(BUILD_TESTING)
+    find_package(ament_cmake_gtest REQUIRED)
+
+    set(JP_GNSS_LIB_SOURCES
+        src/Config.cpp
+        src/Converter.cpp
+        src/Rtk.cpp
+    )
+
+    macro(jp_gnss_hat_add_test TARGET_NAME TEST_SOURCE)
+        ament_add_gtest(${TARGET_NAME} ${TEST_SOURCE} ${JP_GNSS_LIB_SOURCES})
+        ament_target_dependencies(${TARGET_NAME}
+            rclcpp rclcpp_lifecycle std_msgs sensor_msgs geometry_msgs)
+        target_link_libraries(${TARGET_NAME}
+            gnsshat yaml-cpp "${cpp_typesupport_target}")
+        if(GNSSHAT_FETCHED)
+            target_include_directories(${TARGET_NAME} PRIVATE "${_gnsshat_inc}")
+        endif()
+        if(rtcm_msgs_FOUND)
+            target_compile_definitions(${TARGET_NAME} PRIVATE JP_GNSS_NTRIP)
+            ament_target_dependencies(${TARGET_NAME} rtcm_msgs)
+        endif()
+    endmacro()
+
+    jp_gnss_hat_add_test(test_config    test/test_config.cpp)
+    jp_gnss_hat_add_test(test_converter test/test_converter.cpp)
+    jp_gnss_hat_add_test(test_rtk       test/test_rtk.cpp)
+endif()
+
 install(
     DIRECTORY config/
     DESTINATION share/${PROJECT_NAME}/config/
@@ -125,7 +155,7 @@ install(
 )
 
 if(GNSSHAT_FETCHED)
-    install(TARGETS GnssHat LIBRARY DESTINATION lib)
+    install(TARGETS gnsshat LIBRARY DESTINATION lib)
 endif()
 
 ament_package()

@@ -44,6 +44,12 @@ def generate_launch_description():
         parameters=[{
             'config_file': config_path
         }],
+        # Also pass config_file as a CLI-style ROS arg so Main.cpp can read
+        # the YAML (and thus node_id) BEFORE constructing the LifecycleNode.
+        # Without this, parameters arrive only via --params-file, which is
+        # parsed by rclcpp after node construction — too late to influence
+        # the node name and topic prefixes derived from node_id.
+        arguments=['--ros-args', '-p', ['config_file:=', config_path]],
     )
 
     return LaunchDescription([
