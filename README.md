@@ -41,6 +41,7 @@ mkdir -p ~/ros2-ws/src
 cd ~/ros2-ws/src
 git clone https://github.com/jimmypaputto/jp_gnss_hat.git
 cd ~/ros2-ws
+rosdep install --from-paths src --ignore-src -y
 colcon build --packages-select jp_gnss_hat
 source install/setup.bash
 ```

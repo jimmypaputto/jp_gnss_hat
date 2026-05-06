@@ -70,13 +70,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
     DEPENDENCIES std_msgs
 )
 
-if (BUILD_TESTING)
-    find_package(ament_lint_auto REQUIRED)
-    set(ament_cmake_copyright_FOUND TRUE)
-    set(ament_cmake_cpplint_FOUND TRUE)
-    ament_lint_auto_find_test_dependencies()
-endif()
-
 add_executable(
     gnss_node
     src/Config.cpp
@@ -145,6 +138,7 @@ if(BUILD_TESTING)
     jp_gnss_hat_add_test(test_converter test/test_converter.cpp)
     jp_gnss_hat_add_test(test_rtk       test/test_rtk.cpp)
 endif()
+
 
 install(
     DIRECTORY config/
